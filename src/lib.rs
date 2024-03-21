@@ -1902,11 +1902,13 @@ impl Build {
 
         // Target flags
         match cmd.family {
-            ToolFamily::Clang { .. } => {
+            ToolFamily::Clang { zig_cc } => {
+                dbg!("coucou", zig_cc);
                 if !cmd.has_internal_target_arg
                     && !(target.contains("android")
                         && android_clang_compiler_uses_target_arg_internally(&cmd.path))
                 {
+                    dbg!("ici");
                     let (arch, rest) = target.split_once('-').ok_or_else(|| {
                         Error::new(
                             ErrorKind::InvalidTarget,
@@ -1998,7 +2000,7 @@ impl Build {
                             );
                         }
                     } else if let Ok(index) = target_info::RISCV_ARCH_MAPPING
-                        .binary_search_by_key(&arch, |(arch, _)| &arch)
+                        .binary_search_by_key(&arch, |(arch, _)| arch)
                     {
                         cmd.args.push(
                             format!(
@@ -2041,6 +2043,7 @@ impl Build {
 
                         cmd.push_cc_arg(format!("--target={}", target).into());
                     } else {
+                        dbg!("poeut");
                         cmd.push_cc_arg(format!("--target={}", target).into());
                     }
                 }
