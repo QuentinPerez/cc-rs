@@ -1903,12 +1903,10 @@ impl Build {
         // Target flags
         match cmd.family {
             ToolFamily::Clang { zig_cc } => {
-                dbg!("coucou", zig_cc);
                 if !cmd.has_internal_target_arg
                     && !(target.contains("android")
                         && android_clang_compiler_uses_target_arg_internally(&cmd.path))
                 {
-                    dbg!("ici");
                     let (arch, rest) = target.split_once('-').ok_or_else(|| {
                         Error::new(
                             ErrorKind::InvalidTarget,
@@ -2042,8 +2040,12 @@ impl Build {
                         }
 
                         cmd.push_cc_arg(format!("--target={}", target).into());
+                    } else if zig_cc {
+                        // Zig uses a different target triple format
+                        let patched_target = target.replace("-unknown-", "-");
+
+                        cmd.push_cc_arg(format!("--target={}", patched_target).into());
                     } else {
-                        dbg!("poeut");
                         cmd.push_cc_arg(format!("--target={}", target).into());
                     }
                 }
